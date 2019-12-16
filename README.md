@@ -1,7 +1,7 @@
-Are you ready to sharpen your skills?
+Ready to sharpen your skills?
 
 ## Rules of Conduct
-1. **Fork this repo under your personal account** - e.g. https://git.vegaitsourcing.rs/b.miksin/coding-skill-assignment.
+1. **Fork this repo under your personal account** - e.g. https://git.vegaitsourcing.rs/b.miksin/sharpen-your-skills-assignment.
 2. **Use a programming language that is assigned to you** - This challenge is not a competition. There are no better or worse solutions per se. The goal is to evaluate expressiveness of languages and usefulness of programming paradigms.
 3. **Requirements should be implemented in order** - The sequence of requirements is simulating the evolution of customer's expectations over a prolonged period of time, as customer occasionally gets “bright ideas” and hands them over to developers. Implementing requirements all at once or out of order would look like real time was flowing back and forth.
 4. **Application must remain operational at all times** - After implementing each requirement, the application must be correct and fully operational. The newly implemented requirement, as well as all previous requirements must work. If, however, there are bugs or omissions, don’t despair – just apply a fix when you find them and carry on. That is what you would do in a day-to-day development anyway.
