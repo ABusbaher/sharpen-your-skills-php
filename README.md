@@ -1,6 +1,4 @@
-# Price Calculator
-
-Coding skill assignment.
+Are you ready to sharpen your skills?
 
 ## Rules of Conduct
 1. **Fork this repo under your personal account** - e.g. https://git.vegaitsourcing.rs/b.miksin/coding-skill-assignment.
