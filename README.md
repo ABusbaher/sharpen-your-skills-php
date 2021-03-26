@@ -262,8 +262,8 @@ Tax = 20%, no discounts
 Program prints:
 >>>
 Cost = 20.25 USD  
-Tax = 4.25 USD  
-TOTAL = 24.50 USD
+Tax = 4.05 USD  
+TOTAL = 24.30 USD
 >>>
 
 Case #2:  
