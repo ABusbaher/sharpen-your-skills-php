@@ -2,7 +2,7 @@
 
 namespace App\Exceptions;
 
-class ToHighTaxException extends \Exception
+class ToHighValueException extends \Exception
 {
     protected $message = 'Tax must be less than 100!';
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Classes\Discount;
 use App\Classes\Tax;
 use PHPUnit\Framework\TestCase;
 use App\Classes\Product;
@@ -43,13 +44,6 @@ class ProductTest extends TestCase {
     }
 
     /** @test */
-    public function can_calculate_price_with_tax(): void
-    {
-        $taxCost = round(20.25 * 20 / 100, 2);
-        $this->assertEquals($taxCost, $this->product->taxCost());
-    }
-
-    /** @test */
     public function price_with_tax_is_changed_when_tax_is_changed(): void
     {
         $taxCost = round(20.25 * 20 / 100, 2);
@@ -57,5 +51,20 @@ class ProductTest extends TestCase {
         $this->tax->setRate(21);
         $changedTaxCost = round(20.25 * 21 / 100, 2);
         $this->assertEquals($changedTaxCost, $this->product->taxCost());
+    }
+
+    /** @test */
+    public function discount_price_is_0_if_discount_is_not_added(): void
+    {
+        $this->assertEquals(0, $this->product->priceDiscount());
+    }
+
+    /** @test */
+    public function can_calculate_discount_price(): void
+    {
+        $discount = new Discount(10);
+        $productWithDiscount = new Product("Book", 123, 100, $this->tax, $discount);
+        $priceDiscount = round(100 * 10 / 100, 2);
+        $this->assertEquals($priceDiscount, $productWithDiscount->priceDiscount());
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Classes;
 
 use App\Interfaces\ProductInterface;
-use App\Classes\Tax;
 
 class Product implements ProductInterface
 {
@@ -15,12 +14,15 @@ class Product implements ProductInterface
 
     public Tax $taxRate;
 
-    public function __construct($name, $upc, $price, Tax $taxRate)
+    public ?Discount $discount;
+
+    public function __construct($name, $upc, $price, Tax $taxRate, ?Discount $discount = null)
     {
         $this->name = $name;
         $this->upc = $upc;
         $this->price = $price;
         $this->taxRate = $taxRate;
+        $this->discount = $discount ?? null;
     }
 
     public function getName(): string
@@ -43,9 +45,22 @@ class Product implements ProductInterface
         return round($this->getPrice() * $this->taxRate->getRate() / 100, 2);
     }
 
+    public function priceDiscount() :float
+    {
+        if ($this->discount) {
+            return round($this->getPrice() * $this->discount->getDiscount() / 100, 2);
+        }
+        return 0;
+    }
+
     public function getPriceWithTax() : float
     {
         return $this->getPrice() + $this->taxCost();
+    }
+
+    public function getPriceWithTaxAndDiscount() : float
+    {
+        return $this->getPrice() + $this->taxCost() - $this->priceDiscount();
     }
 
 }

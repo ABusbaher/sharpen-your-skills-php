@@ -6,18 +6,18 @@ use App\Exceptions\NotFloatException;
 use App\Exceptions\NotPositiveFloatException;
 use App\Exceptions\ToHighValueException;
 
-class Tax {
+class Discount
+{
+    private int|float $discount;
 
-    private int|float $rate;
-
-    public function __construct(int|float $rate = 20)
+    public function __construct(int|float $discount = 0)
     {
-        $this->rate = $rate;
+        $this->discount = $discount;
     }
 
-    public function getRate(): int|float
+    public function getDiscount(): int|float
     {
-        return $this->rate;
+        return $this->discount;
     }
 
     /**
@@ -25,17 +25,17 @@ class Tax {
      * @throws NotFloatException
      * @throws ToHighValueException
      */
-    public function setRate($rate): void
+    public function setDiscount($discount): void
     {
-        if (!is_numeric($rate)) {
+        if (!is_numeric($discount)) {
             throw new NotFloatException();
         }
-        if ($rate < 0) {
+        if ($discount < 0) {
             throw new NotPositiveFloatException();
         }
-        if ($rate > 100) {
+        if ($discount > 100) {
             throw new ToHighValueException();
         }
-        $this->rate = $rate;
+        $this->discount = $discount;
     }
 }

@@ -2,48 +2,48 @@
 
 namespace Tests\Unit;
 
-use App\Classes\Tax;
+use App\Classes\Discount;
 use App\Exceptions\NotFloatException;
 use App\Exceptions\NotPositiveFloatException;
 use App\Exceptions\ToHighValueException;
 use PHPUnit\Framework\TestCase;
 
-class TaxTest extends TestCase {
+class DiscountTest extends TestCase {
 
-    private Tax $tax;
+    private Discount $discount;
 
     protected function setUp() : void
     {
-        $this->tax = new Tax(20);
+        $this->discount = new Discount(15);
     }
 
     /** @test */
-    public function can_change_tax_rate(): void
+    public function can_change_discount(): void
     {
-        $this->assertEquals(20, $this->tax->getRate());
-        $this->tax->setRate(21);
-        $this->assertEquals(21, $this->tax->getRate());
+        $this->assertEquals(15, $this->discount->getDiscount());
+        $this->discount->setDiscount(20);
+        $this->assertEquals(20, $this->discount->getDiscount());
     }
 
     /** @test */
     public function exception_when_set_not_float_or_numeric_tax_rate(): void
     {
         $this->expectException(NotFloatException::class);
-        $this->tax->setRate('not number or float');
+        $this->discount->setDiscount('not number or float');
     }
 
     /** @test */
     public function exception_when_set_negative_tax_rate(): void
     {
         $this->expectException(NotPositiveFloatException::class);
-        $this->tax->setRate(-4);
+        $this->discount->setDiscount(-4);
     }
 
     /** @test */
     public function exception_when_set_tax_rate_bigger_than_100(): void
     {
         $this->expectException(ToHighValueException::class);
-        $this->tax->setRate(120);
+        $this->discount->setDiscount(120);
     }
 
 }
