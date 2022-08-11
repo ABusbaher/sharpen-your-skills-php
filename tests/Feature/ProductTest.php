@@ -49,4 +49,24 @@ class ProductTest extends TestCase {
         $this->assertEquals($priceWithTaxAndDiscount, $this->productWithDiscount->getPriceWithTaxAndDiscount());
     }
 
+    /** @test */
+    public function can_generate_report_without_discount(): void
+    {
+        $report = $this->product->reportCosts();
+        $this->assertStringContainsString('Cost = $' . $this->product->getPrice(), $report);
+        $this->assertStringContainsString('Tax = $' . $this->product->taxCost(), $report);
+        $this->assertStringContainsString('TOTAL = $' . $this->product->getPriceWithTaxAndDiscount(), $report);
+        $this->assertStringNotContainsString('Discounts = $' . $this->product->priceDiscount(), $report);
+    }
+
+    /** @test */
+    public function can_generate_report_with_discount(): void
+    {
+        $report = $this->productWithDiscount->reportCosts();
+        $this->assertStringContainsString('Cost = $' . $this->productWithDiscount->getPrice(), $report);
+        $this->assertStringContainsString('Tax = $' . $this->productWithDiscount->taxCost(), $report);
+        $this->assertStringContainsString('TOTAL = $' . $this->productWithDiscount->getPriceWithTaxAndDiscount(), $report);
+        $this->assertStringContainsString('Discounts = $' . $this->productWithDiscount->priceDiscount(), $report);
+    }
+
 }

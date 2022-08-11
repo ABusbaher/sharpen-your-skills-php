@@ -63,4 +63,12 @@ class Product implements ProductInterface
         return $this->getPrice() + $this->taxCost() - $this->priceDiscount();
     }
 
+    public function reportCosts(): string
+    {
+        $costs = nl2br('Cost = $' . $this->getPrice() . "\n");
+        $tax = nl2br('Tax = $' . $this->taxCost() . "\n");
+        $discount = $this->discount ? nl2br('Discounts = $' . $this->priceDiscount() . "\n") : NULL;
+        $total = nl2br('TOTAL = $' . $this->getPriceWithTaxAndDiscount() . "\n");
+        return $costs  . $tax  . $discount  . $total;
+    }
 }
