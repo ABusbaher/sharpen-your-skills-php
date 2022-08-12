@@ -15,6 +15,7 @@ require_once  __DIR__ . '/../app/bootstrap.php';
 include_once __DIR__ . '/partials/Tax.php';
 include_once __DIR__ . '/partials/Discount.php';
 include_once __DIR__ . '/partials/Report.php';
+include_once __DIR__ . '/partials/Selective.php';
 ?>
 </body>
 </html>

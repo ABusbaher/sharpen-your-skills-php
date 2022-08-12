@@ -12,7 +12,9 @@ interface ProductInterface
 
     public function getPriceWithTax();
 
-    public function getPriceWithTaxAndDiscount();
+    public function allDiscounts();
+
+    public function getPriceWithTaxAndDiscounts();
 
     public function reportCosts();
 }
