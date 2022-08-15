@@ -12,10 +12,13 @@ class UpcDiscount
 
     private int $upc;
 
-    public function __construct(int|float $upcDiscount, int $upc)
+    private bool $beforeTax;
+
+    public function __construct(int|float $upcDiscount, int $upc, bool $beforeTax = false)
     {
         $this->upcDiscount = $upcDiscount;
         $this->upc = $upc;
+        $this->beforeTax = $beforeTax;
     }
 
     public function getUpc(): int
@@ -26,6 +29,11 @@ class UpcDiscount
     public function getUpcDiscount(): int|float
     {
         return $this->upcDiscount;
+    }
+
+    public function isBeforeTax(): bool
+    {
+        return $this->beforeTax;
     }
 
     /**

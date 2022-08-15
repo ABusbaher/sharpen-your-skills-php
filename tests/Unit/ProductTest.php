@@ -63,7 +63,7 @@ class ProductTest extends TestCase {
     /** @test */
     public function discount_price_is_0_if_discount_is_not_added(): void
     {
-        $this->assertEquals(0, $this->product->priceDiscount());
+        $this->assertEquals(0, $this->product->universalDiscount());
     }
 
     /** @test */
@@ -71,13 +71,13 @@ class ProductTest extends TestCase {
     {
         $priceDiscount = round($this->productWithDiscount->getPrice() *
             $this->discount->getDiscount() / 100, 2);
-        $this->assertEquals($priceDiscount, $this->productWithDiscount->priceDiscount());
+        $this->assertEquals($priceDiscount, $this->productWithDiscount->universalDiscount());
     }
 
     /** @test */
     public function price_upc_discount_is_0_if_upc_discount_is_not_added(): void
     {
-        $this->assertEquals(0, $this->product->priceUpcDiscount());
+        $this->assertEquals(0, $this->product->upcDiscountAmount());
     }
 
     /** @test */
@@ -85,7 +85,7 @@ class ProductTest extends TestCase {
     {
         $productOtherUpc = new Product("Book", 123, 100,
             $this->tax, null, $this->upcDiscount);
-        $this->assertEquals(0, $productOtherUpc->priceUpcDiscount());
+        $this->assertEquals(0, $productOtherUpc->upcDiscountAmount());
     }
 
     /** @test */
@@ -95,7 +95,7 @@ class ProductTest extends TestCase {
             $this->tax, null, $this->upcDiscount);
         $priceUpcDiscount = round($productWithUpcDiscount->getPrice() *
             $this->upcDiscount->getUpcDiscount()  / 100, 2);
-        $this->assertEquals($priceUpcDiscount, $productWithUpcDiscount->priceUpcDiscount());
+        $this->assertEquals($priceUpcDiscount, $productWithUpcDiscount->upcDiscountAmount());
     }
 
     /** @test */
@@ -106,5 +106,52 @@ class ProductTest extends TestCase {
         $allDiscounts = round($productWithDiscounts->getPrice() * $this->discount->getDiscount() / 100, 2)
             + round($productWithDiscounts->getPrice() * $this->upcDiscount->getUpcDiscount() / 100, 2);
         $this->assertEquals($allDiscounts, $productWithDiscounts->allDiscounts());
+    }
+
+    /** @test */
+    public function can_calculate_lower_price_when_upc_discount_before_price(): void
+    {
+        $upcDiscount = new UpcDiscount(10, 1244, true);
+        $product = new Product("Book", 1244, 100, $this->tax,
+            $this->discount, $upcDiscount);
+        $lowerPrice = $product->getPrice() - $product->upcDiscountAmount();
+        $this->assertEquals($lowerPrice, $product->lowerPrice());
+    }
+
+    /** @test */
+    public function can_calculate_lower_price_when_universal_discount_before_price(): void
+    {
+        $discount = new Discount(10, true);
+        $product = new Product("Book", 1244, 100, $this->tax,
+            $discount);
+        $lowerPrice = $product->getPrice() - $product->universalDiscount();
+        $this->assertEquals($lowerPrice, $product->lowerPrice());
+    }
+
+    /** @test */
+    public function can_calculate_lower_price_when_universal_discount_and_upc_discount_before_price(): void
+    {
+        $upcDiscount = new UpcDiscount(10, 1244, true);
+        $discount = new Discount(10, true);
+        $product = new Product("Book", 1244, 100, $this->tax,
+            $discount, $upcDiscount);
+        $lowerPrice = $product->getPrice() - $product->universalDiscount() - $product->upcDiscountAmount();
+        $this->assertEquals($lowerPrice, $product->lowerPrice());
+    }
+
+    /** @test */
+    public function lower_price_is_equal_to_price_when_no_discount_before_tax(): void
+    {
+        $productWithDiscounts = new Product("Book", 123, 100, $this->tax, $this->discount, $this->upcDiscount);
+        $lowerPrice = $productWithDiscounts->getPrice();
+        $this->assertEquals($lowerPrice, $productWithDiscounts->lowerPrice());
+    }
+
+    /** @test */
+    public function lower_price_is_equal_to_price_when_no_discounts(): void
+    {
+        $productWithoutDiscounts = new Product("Book", 123, 100, $this->tax);
+        $lowerPrice = $productWithoutDiscounts->getPrice();
+        $this->assertEquals($lowerPrice, $productWithoutDiscounts->lowerPrice());
     }
 }

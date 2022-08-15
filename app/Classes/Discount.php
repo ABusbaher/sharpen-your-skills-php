@@ -10,9 +10,17 @@ class Discount
 {
     private int|float $discount;
 
-    public function __construct(int|float $discount = 0)
+    private bool $beforeTax;
+
+    public function __construct(int|float $discount = 0, bool $beforeTax = false)
     {
         $this->discount = $discount;
+        $this->beforeTax = $beforeTax;
+    }
+
+    public function isBeforeTax(): bool
+    {
+        return $this->beforeTax;
     }
 
     public function getDiscount(): int|float

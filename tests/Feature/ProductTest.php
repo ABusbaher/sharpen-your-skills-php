@@ -50,7 +50,7 @@ class ProductTest extends TestCase {
         $priceWithTaxAndDiscount =
             $this->productWithDiscount->getPrice() +
             $this->productWithDiscount->taxCost() -
-            $this->productWithDiscount->priceDiscount();
+            $this->productWithDiscount->universalDiscount();
         $this->assertEquals($priceWithTaxAndDiscount, $this->productWithDiscount->getPriceWithTaxAndDiscounts());
     }
 
@@ -61,7 +61,7 @@ class ProductTest extends TestCase {
         $this->assertStringContainsString('Cost = $' . $this->product->getPrice(), $report);
         $this->assertStringContainsString('Tax = $' . $this->product->taxCost(), $report);
         $this->assertStringContainsString('TOTAL = $' . $this->product->getPriceWithTaxAndDiscounts(), $report);
-        $this->assertStringNotContainsString('Discounts = $' . $this->product->priceDiscount(), $report);
+        $this->assertStringNotContainsString('Discounts = $' . $this->product->allDiscounts(), $report);
     }
 
     /** @test */
@@ -71,7 +71,7 @@ class ProductTest extends TestCase {
         $this->assertStringContainsString('Cost = $' . $this->productWithDiscount->getPrice(), $report);
         $this->assertStringContainsString('Tax = $' . $this->productWithDiscount->taxCost(), $report);
         $this->assertStringContainsString('TOTAL = $' . $this->productWithDiscount->getPriceWithTaxAndDiscounts(), $report);
-        $this->assertStringContainsString('Discounts = $' . $this->productWithDiscount->priceDiscount(), $report);
+        $this->assertStringContainsString('Discounts = $' . $this->productWithDiscount->allDiscounts(), $report);
     }
 
     /** @test */
@@ -81,6 +81,46 @@ class ProductTest extends TestCase {
         $this->assertStringContainsString('Cost = $' . $this->productWithTwoDiscounts->getPrice(), $report);
         $this->assertStringContainsString('Tax = $' . $this->productWithTwoDiscounts->taxCost(), $report);
         $this->assertStringContainsString('TOTAL = $' . $this->productWithTwoDiscounts->getPriceWithTaxAndDiscounts(), $report);
-        $this->assertStringContainsString('Discounts = $' . $this->productWithTwoDiscounts->priceDiscount(), $report);
+        $this->assertStringContainsString('Discounts = $' . $this->productWithTwoDiscounts->allDiscounts(), $report);
+    }
+
+    /** @test */
+    public function can_generate_report_with_upc_discount_before_tax(): void
+    {
+        $upcDiscount = new UpcDiscount(5, 12345, true);
+        $product = new Product("The Little Prince", 12345, 100,
+            $this->tax, null, $upcDiscount);
+        $report = $product->reportCosts();
+        $this->assertStringContainsString('Cost = $' . $product->getPrice(), $report);
+        $this->assertStringContainsString('Tax = $' . $product->taxCost(), $report);
+        $this->assertStringContainsString('TOTAL = $' . $product->getPriceWithTaxAndDiscounts(), $report);
+        $this->assertStringContainsString('Discounts = $' . $product->allDiscounts(), $report);
+    }
+
+    /** @test */
+    public function can_generate_report_with_universal_discount_before_tax(): void
+    {
+        $discount = new Discount(10, true);
+        $product = new Product("The Little Prince", 12345, 100,
+            $this->tax, $discount);
+        $report = $product->reportCosts();
+        $this->assertStringContainsString('Cost = $' . $product->getPrice(), $report);
+        $this->assertStringContainsString('Tax = $' . $product->taxCost(), $report);
+        $this->assertStringContainsString('TOTAL = $' . $product->getPriceWithTaxAndDiscounts(), $report);
+        $this->assertStringContainsString('Discounts = $' . $product->allDiscounts(), $report);
+    }
+
+    /** @test */
+    public function can_generate_report_with_both_discounts_before_tax(): void
+    {
+        $discount = new Discount(10, true);
+        $upcDiscount = new UpcDiscount(5, 12345, true);
+        $product = new Product("The Little Prince", 12345, 100,
+            $this->tax, $discount, $upcDiscount);
+        $report = $product->reportCosts();
+        $this->assertStringContainsString('Cost = $' . $product->getPrice(), $report);
+        $this->assertStringContainsString('Tax = $' . $product->taxCost(), $report);
+        $this->assertStringContainsString('TOTAL = $' . $product->getPriceWithTaxAndDiscounts(), $report);
+        $this->assertStringContainsString('Discounts = $' . $product->allDiscounts(), $report);
     }
 }

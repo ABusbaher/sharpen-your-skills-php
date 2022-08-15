@@ -46,36 +46,69 @@ class Product implements ProductInterface
 
     public function taxCost() :float
     {
-        return round($this->getPrice() * $this->taxRate->getRate() / 100, 2);
+        return round($this->lowerPrice() * $this->taxRate->getRate() / 100, 2);
     }
 
-    public function priceDiscount() :float
+    public function universalDiscount() :float
     {
         if ($this->discount) {
-            return round($this->getPrice() * $this->discount->getDiscount() / 100, 2);
+            if($this->discount->isBeforeTax()) {
+                return round($this->getPrice() * $this->discount->getDiscount() / 100, 2);
+            }
+            return round($this->lowerPrice() * $this->discount->getDiscount() / 100, 2);
         }
         return 0;
     }
 
-    public function priceUpcDiscount() :float
+    public function upcDiscountAmount() :float
     {
         if ($this->upcDiscount) {
             if($this->upcDiscount->getUpc() === $this->getUpc()) {
-                return round($this->getPrice() * $this->upcDiscount->getUpcDiscount() / 100, 2);
+                if($this->upcDiscount->isBeforeTax()) {
+                    return round($this->getPrice() * $this->upcDiscount->getUpcDiscount() / 100, 2);
+                }
+                return round($this->lowerPrice() * $this->upcDiscount->getUpcDiscount() / 100, 2);
             }
             return 0;
         }
         return 0;
     }
 
+    public function lowerPrice() :float
+    {
+        if ($this->upcDiscount && $this->discount) {
+            if ($this->discount->isBeforeTax() && $this->upcDiscount->isBeforeTax()) {
+                return $this->getPrice() - $this->universalDiscount() - $this->upcDiscountAmount();
+            }else if ($this->discount->isBeforeTax()) {
+                return $this->getPrice() - $this->universalDiscount();
+            }else if ($this->upcDiscount->isBeforeTax()) {
+                return $this->getPrice() - $this->upcDiscountAmount();
+            }else {
+                return $this->getPrice();
+            }
+        }elseif ($this->discount) {
+            if($this->discount->isBeforeTax()) {
+                return $this->getPrice() - $this->universalDiscount();
+            }
+            return $this->getPrice();
+        }elseif ($this->upcDiscount) {
+            if($this->upcDiscount->isBeforeTax()) {
+                return $this->getPrice() - $this->upcDiscountAmount();
+            }
+            return $this->getPrice();
+        }
+        return $this->getPrice();
+
+    }
+
     public function allDiscounts() :float
     {
-        return $this->priceUpcDiscount() + $this->priceDiscount();
+        return $this->upcDiscountAmount() + $this->universalDiscount();
     }
 
     public function getPriceWithTax() : float
     {
-        return $this->getPrice() + $this->taxCost();
+        return $this->lowerPrice() + $this->taxCost();
     }
 
     public function getPriceWithTaxAndDiscounts() : float
