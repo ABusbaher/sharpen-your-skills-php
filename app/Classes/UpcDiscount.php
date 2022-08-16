@@ -14,11 +14,14 @@ class UpcDiscount
 
     private bool $beforeTax;
 
-    public function __construct(int|float $upcDiscount, int $upc, bool $beforeTax = false)
+    private bool $multiplicativeDiscount;
+
+    public function __construct(int|float $upcDiscount, int $upc, bool $beforeTax = false, bool $multiplicativeDiscount = false)
     {
         $this->upcDiscount = $upcDiscount;
         $this->upc = $upc;
         $this->beforeTax = $beforeTax;
+        $this->multiplicativeDiscount = $multiplicativeDiscount;
     }
 
     public function getUpc(): int
@@ -34,6 +37,11 @@ class UpcDiscount
     public function isBeforeTax(): bool
     {
         return $this->beforeTax;
+    }
+
+    public function isMultiplicativeDiscount(): bool
+    {
+        return $this->multiplicativeDiscount;
     }
 
     /**
@@ -53,5 +61,10 @@ class UpcDiscount
             throw new ToHighValueException();
         }
         $this->upcDiscount = $discount;
+    }
+
+    public function setMultiplicativeDiscount(bool $multiplicativeDiscount): void
+    {
+        $this->multiplicativeDiscount = $multiplicativeDiscount;
     }
 }

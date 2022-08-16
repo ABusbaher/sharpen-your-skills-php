@@ -46,4 +46,12 @@ class DiscountTest extends TestCase {
         $this->discount->setDiscount(120);
     }
 
+    /** @test */
+    public function can_set_multiplicative_discount(): void
+    {
+        $this->assertFalse( $this->discount->isMultiplicativeDiscount());
+        $this->discount->setMultiplicativeDiscount(true);
+        $this->assertTrue( $this->discount->isMultiplicativeDiscount());
+    }
+
 }

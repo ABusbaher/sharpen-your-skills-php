@@ -56,16 +56,36 @@ class Product implements ProductInterface
         return round($this->lowerPrice() * $this->taxRate->getRate() / 100, 2);
     }
 
-    public function universalDiscount() :float
+    private function multiplicativeUniversalDiscountAmount(): float
+    {
+        if ($this->discount->isMultiplicativeDiscount()) {
+            return round(($this->getPrice() - $this->upcDiscountAmount()) * $this->discount->getDiscount() / 100, 2);
+        }
+        return round($this->lowerPrice() * $this->discount->getDiscount() / 100, 2);
+    }
+
+    public function universalDiscountAmount() :float
     {
         if ($this->discount) {
             if($this->discount->isBeforeTax()) {
                 return round($this->getPrice() * $this->discount->getDiscount() / 100, 2);
             }
+            if ($this->upcDiscount) {
+                return $this->multiplicativeUniversalDiscountAmount();
+            }
             return round($this->lowerPrice() * $this->discount->getDiscount() / 100, 2);
         }
         return 0;
     }
+
+    private function multiplicativeUpcDiscountAmount(): float
+    {
+        if ($this->upcDiscount->isMultiplicativeDiscount()) {
+            return round(($this->getPrice() - $this->universalDiscountAmount()) * $this->upcDiscount->getUpcDiscount() / 100, 2);
+        }
+        return round($this->lowerPrice() * $this->upcDiscount->getUpcDiscount() / 100, 2);
+    }
+
 
     public function upcDiscountAmount() :float
     {
@@ -73,6 +93,9 @@ class Product implements ProductInterface
             if($this->upcDiscount->getUpc() === $this->getUpc()) {
                 if($this->upcDiscount->isBeforeTax()) {
                     return round($this->getPrice() * $this->upcDiscount->getUpcDiscount() / 100, 2);
+                }
+                if ($this->discount) {
+                    return $this->multiplicativeUpcDiscountAmount();
                 }
                 return round($this->lowerPrice() * $this->upcDiscount->getUpcDiscount() / 100, 2);
             }
@@ -113,9 +136,9 @@ class Product implements ProductInterface
     {
         if ($this->upcDiscount && $this->discount) {
             if ($this->discount->isBeforeTax() && $this->upcDiscount->isBeforeTax()) {
-                return $this->getPrice() - $this->universalDiscount() - $this->upcDiscountAmount();
+                return $this->getPrice() - $this->universalDiscountAmount() - $this->upcDiscountAmount();
             }else if ($this->discount->isBeforeTax()) {
-                return $this->getPrice() - $this->universalDiscount();
+                return $this->getPrice() - $this->universalDiscountAmount();
             }else if ($this->upcDiscount->isBeforeTax()) {
                 return $this->getPrice() - $this->upcDiscountAmount();
             }else {
@@ -123,7 +146,7 @@ class Product implements ProductInterface
             }
         }elseif ($this->discount) {
             if($this->discount->isBeforeTax()) {
-                return $this->getPrice() - $this->universalDiscount();
+                return $this->getPrice() - $this->universalDiscountAmount();
             }
             return $this->getPrice();
         }elseif ($this->upcDiscount) {
@@ -138,7 +161,7 @@ class Product implements ProductInterface
 
     public function allDiscounts() :float
     {
-        return $this->upcDiscountAmount() + $this->universalDiscount();
+        return $this->upcDiscountAmount() + $this->universalDiscountAmount();
     }
 
     public function getPriceWithTax() : float
@@ -161,4 +184,5 @@ class Product implements ProductInterface
         $total = nl2br('TOTAL = $' . $this->getPriceWithTaxAndDiscounts() . "\n");
         return $costs  . $tax  . $discount . $packaging . $transport . $total;
     }
+
 }

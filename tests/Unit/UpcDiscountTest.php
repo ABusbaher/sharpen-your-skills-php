@@ -47,4 +47,12 @@ class UpcDiscountTest extends TestCase {
         $this->upcDiscount->setUpcDiscount(120);
     }
 
+    /** @test */
+    public function can_set_multiplicative_discount(): void
+    {
+        $this->assertFalse( $this->upcDiscount->isMultiplicativeDiscount());
+        $this->upcDiscount->setMultiplicativeDiscount(true);
+        $this->assertTrue( $this->upcDiscount->isMultiplicativeDiscount());
+    }
+
 }

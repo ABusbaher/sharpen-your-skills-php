@@ -18,5 +18,9 @@ interface ProductInterface
 
     public function lowerPrice();
 
+    public function getTransportCost();
+
+    public function getPackagingCost();
+
     public function reportCosts();
 }

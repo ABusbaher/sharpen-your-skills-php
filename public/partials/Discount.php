@@ -23,6 +23,6 @@ $productWithDiscount = new Product("The Little Prince", 12345, 20.25, $tax, $dis
 ?>
 <h4>Tax=<?php echo $tax->getRate() ?>%, discount=<?php echo $discount->getDiscount() ?>%</h4>
 <h4>Tax amount = $<?php echo $productWithDiscount->taxCost() ?>;
-    Discount amount = $<?php echo $productWithDiscount->universalDiscount() ?></h4>
+    Discount amount = $<?php echo $productWithDiscount->universalDiscountAmount() ?></h4>
 <h4>Price before = $<?php echo $productWithDiscount->getPrice() ?>,
     price after = $<?php echo $productWithDiscount->getPriceWithTaxAndDiscounts() ?></h4>

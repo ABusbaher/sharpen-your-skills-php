@@ -64,7 +64,7 @@ class ProductTest extends TestCase {
     /** @test */
     public function discount_price_is_0_if_discount_is_not_added(): void
     {
-        $this->assertEquals(0, $this->product->universalDiscount());
+        $this->assertEquals(0, $this->product->universalDiscountAmount());
     }
 
     /** @test */
@@ -72,7 +72,7 @@ class ProductTest extends TestCase {
     {
         $priceDiscount = round($this->productWithDiscount->getPrice() *
             $this->discount->getDiscount() / 100, 2);
-        $this->assertEquals($priceDiscount, $this->productWithDiscount->universalDiscount());
+        $this->assertEquals($priceDiscount, $this->productWithDiscount->universalDiscountAmount());
     }
 
     /** @test */
@@ -125,7 +125,7 @@ class ProductTest extends TestCase {
         $discount = new Discount(10, true);
         $product = new Product("Book", 1244, 100, $this->tax,
             $discount);
-        $lowerPrice = $product->getPrice() - $product->universalDiscount();
+        $lowerPrice = $product->getPrice() - $product->universalDiscountAmount();
         $this->assertEquals($lowerPrice, $product->lowerPrice());
     }
 
@@ -136,7 +136,7 @@ class ProductTest extends TestCase {
         $discount = new Discount(10, true);
         $product = new Product("Book", 1244, 100, $this->tax,
             $discount, $upcDiscount);
-        $lowerPrice = $product->getPrice() - $product->universalDiscount() - $product->upcDiscountAmount();
+        $lowerPrice = $product->getPrice() - $product->universalDiscountAmount() - $product->upcDiscountAmount();
         $this->assertEquals($lowerPrice, $product->lowerPrice());
     }
 
@@ -180,5 +180,38 @@ class ProductTest extends TestCase {
     public function transport_cost_is_0_if_no_transport(): void
     {
         $this->assertEquals(0, $this->product->getTransportCost());
+    }
+
+    /** @test */
+    public function can_calculate_universal_multiplicative_discount(): void
+    {
+        $multiplicativeDiscount = new Discount(15, false, true);
+        $productWithMultiplicativeDiscount = new Product("Book", 1244, 100, $this->tax,
+            $multiplicativeDiscount, $this->upcDiscount);
+        $universalDiscount = round(($productWithMultiplicativeDiscount->getPrice() - $productWithMultiplicativeDiscount->upcDiscountAmount())
+            * $multiplicativeDiscount->getDiscount() / 100, 2);
+        $this->assertEquals($universalDiscount, $productWithMultiplicativeDiscount->universalDiscountAmount());
+    }
+
+    /** @test */
+    public function can_calculate_upc_multiplicative_discount(): void
+    {
+        $multiplicativeUpcDiscount = new UpcDiscount(15, 1244, false, true);
+        $productWithMultiplicativeDiscount = new Product("Book", 1244, 100, $this->tax,
+            $this->discount, $multiplicativeUpcDiscount);
+        $upcDiscount = round(($productWithMultiplicativeDiscount->getPrice() - $productWithMultiplicativeDiscount->universalDiscountAmount())
+            * $multiplicativeUpcDiscount->getUpcDiscount() / 100, 2);
+        $this->assertEquals($upcDiscount, $productWithMultiplicativeDiscount->upcDiscountAmount());
+    }
+
+    /** @test */
+    public function no_universal_multiplicative_discount_if_no_upc_discount(): void
+    {
+        $multiplicativeDiscount = new Discount(15, false, true);
+        $productWithMultiplicativeDiscount = new Product("Book", 1244, 100, $this->tax,
+            $multiplicativeDiscount);
+        $universalDiscount = round($productWithMultiplicativeDiscount->getPrice()
+            * $multiplicativeDiscount->getDiscount() / 100, 2);
+        $this->assertEquals($universalDiscount, $productWithMultiplicativeDiscount->universalDiscountAmount());
     }
 }

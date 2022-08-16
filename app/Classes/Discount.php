@@ -12,10 +12,13 @@ class Discount
 
     private bool $beforeTax;
 
-    public function __construct(int|float $discount = 0, bool $beforeTax = false)
+    private bool $multiplicativeDiscount;
+
+    public function __construct(int|float $discount = 0, bool $beforeTax = false, bool $multiplicativeDiscount = false)
     {
         $this->discount = $discount;
         $this->beforeTax = $beforeTax;
+        $this->multiplicativeDiscount = $multiplicativeDiscount;
     }
 
     public function isBeforeTax(): bool
@@ -26,6 +29,11 @@ class Discount
     public function getDiscount(): int|float
     {
         return $this->discount;
+    }
+
+    public function isMultiplicativeDiscount(): bool
+    {
+        return $this->multiplicativeDiscount;
     }
 
     /**
@@ -45,5 +53,10 @@ class Discount
             throw new ToHighValueException();
         }
         $this->discount = $discount;
+    }
+
+    public function setMultiplicativeDiscount(bool $multiplicativeDiscount): void
+    {
+        $this->multiplicativeDiscount = $multiplicativeDiscount;
     }
 }

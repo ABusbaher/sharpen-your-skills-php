@@ -54,7 +54,7 @@ class ProductTest extends TestCase {
         $priceWithTaxAndDiscount =
             $this->productWithDiscount->getPrice() +
             $this->productWithDiscount->taxCost() -
-            $this->productWithDiscount->universalDiscount();
+            $this->productWithDiscount->universalDiscountAmount();
         $this->assertEquals($priceWithTaxAndDiscount, $this->productWithDiscount->getPriceWithTaxAndDiscounts());
     }
 
@@ -142,5 +142,31 @@ class ProductTest extends TestCase {
         $this->assertStringContainsString('Transport = $' . $productWithAdditionalCost->getTransportCost(), $report);
         $this->assertStringContainsString('Packaging = $' . $productWithAdditionalCost->getPackagingCost(), $report);
         $this->assertStringContainsString('TOTAL = $' . $productWithAdditionalCost->getPriceWithTaxAndDiscounts(), $report);
+    }
+
+    /** @test */
+    public function can_generate_correct_report_with_multiplicative_upc_discount(): void
+    {
+        $multiplicativeUpcDiscount = new UpcDiscount(10, 12345, false, true);
+        $productWithMultiplicativeUpcDiscount = new Product("The Little Prince", 12345, 20.25,
+            $this->tax, $this->discount, $multiplicativeUpcDiscount);
+        $report = $productWithMultiplicativeUpcDiscount->reportCosts();
+        $this->assertStringContainsString('Cost = $' . $productWithMultiplicativeUpcDiscount->getPrice(), $report);
+        $this->assertStringContainsString('Tax = $' . $productWithMultiplicativeUpcDiscount->taxCost(), $report);
+        $this->assertStringContainsString('Discounts = $' . $productWithMultiplicativeUpcDiscount->allDiscounts(), $report);
+        $this->assertStringContainsString('TOTAL = $' . $productWithMultiplicativeUpcDiscount->getPriceWithTaxAndDiscounts(), $report);
+    }
+
+    /** @test */
+    public function can_generate_correct_report_with_multiplicative_universal_discount(): void
+    {
+        $multiplicativeDiscount = new Discount(10, false, true);
+        $productWithMultiplicativeUpcDiscount = new Product("The Little Prince", 12345, 20.25,
+            $this->tax, $multiplicativeDiscount, $this->upcDiscount);
+        $report = $productWithMultiplicativeUpcDiscount->reportCosts();
+        $this->assertStringContainsString('Cost = $' . $productWithMultiplicativeUpcDiscount->getPrice(), $report);
+        $this->assertStringContainsString('Tax = $' . $productWithMultiplicativeUpcDiscount->taxCost(), $report);
+        $this->assertStringContainsString('Discounts = $' . $productWithMultiplicativeUpcDiscount->allDiscounts(), $report);
+        $this->assertStringContainsString('TOTAL = $' . $productWithMultiplicativeUpcDiscount->getPriceWithTaxAndDiscounts(), $report);
     }
 }
