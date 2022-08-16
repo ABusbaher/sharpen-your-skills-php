@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Classes\Cap;
 use App\Classes\Discount;
 use App\Classes\Tax;
 use App\Classes\Transport;
@@ -213,5 +214,33 @@ class ProductTest extends TestCase {
         $universalDiscount = round($productWithMultiplicativeDiscount->getPrice()
             * $multiplicativeDiscount->getDiscount() / 100, 2);
         $this->assertEquals($universalDiscount, $productWithMultiplicativeDiscount->universalDiscountAmount());
+    }
+
+    /** @test */
+    public function can_calculate_cap_with_absolute_type_of_amount(): void
+    {
+        $cap = new Cap(20, 'absolute');
+        $productWithAbsoluteCap = new Product("Book", 1244, 100, $this->tax,
+            null, null, null, null, $cap);
+        $capDiscount = round($productWithAbsoluteCap->getPrice()
+            * $cap->getAmount() / 100, 2);
+        $this->assertEquals($capDiscount, $productWithAbsoluteCap->calculateCap());
+    }
+
+    /** @test */
+    public function can_calculate_cap_with_percentage_type_of_amount(): void
+    {
+        $cap = new Cap(20, 'percentage');
+        $productWithPercentageCap = new Product("Book", 1244, 100, $this->tax,
+            null, null, null, null, $cap);
+        $capDiscount = round($productWithPercentageCap->getPrice()
+            * $cap->getAmount() / 100, 2);
+        $this->assertEquals($capDiscount, $productWithPercentageCap->calculateCap());
+    }
+
+    /** @test */
+    public function calculate_cap_is_null_when_no_cap(): void
+    {
+        $this->assertNull($this->product->calculateCap());
     }
 }

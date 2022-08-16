@@ -22,9 +22,11 @@ class Product implements ProductInterface
 
     public ?Packaging $packaging;
 
+    public ?Cap $cap;
+
     public function __construct($name, $upc, $price, Tax $taxRate,
                                 ?Discount $discount = null, ?UpcDiscount $upcDiscount = null,
-                                ?Transport $transport = null, ?Packaging $packaging = null)
+                                ?Transport $transport = null, ?Packaging $packaging = null, ?Cap $cap = null)
     {
         $this->name = $name;
         $this->upc = $upc;
@@ -34,6 +36,7 @@ class Product implements ProductInterface
         $this->upcDiscount = $upcDiscount ?? null;
         $this->transport = $transport ?? null;
         $this->packaging = $packaging ?? null;
+        $this->cap = $cap ?? null;
     }
 
     public function getName(): string
@@ -159,9 +162,29 @@ class Product implements ProductInterface
 
     }
 
+    public function calculateCap() :?float {
+        if ($this->cap) {
+            if ($this->cap->getTypeOfAmount() === 'absolute') {
+                return $this->cap->getAmount();
+            }
+            if ($this->cap->getTypeOfAmount() == 'percentage') {
+                return round($this->getPrice() * $this->cap->getAmount() / 100, 2);
+            }
+            return null;
+        }
+        return null;
+    }
+
     public function allDiscounts() :float
     {
-        return $this->upcDiscountAmount() + $this->universalDiscountAmount();
+        $allDiscountsWithoutCap = $this->upcDiscountAmount() + $this->universalDiscountAmount();
+        if ($this->cap) {
+            if ($this->calculateCap() && $this->calculateCap() < $allDiscountsWithoutCap) {
+                return $this->calculateCap();
+            }
+            return $allDiscountsWithoutCap;
+        }
+        return $allDiscountsWithoutCap;
     }
 
     public function getPriceWithTax() : float

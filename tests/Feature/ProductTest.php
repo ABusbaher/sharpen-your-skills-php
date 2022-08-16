@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Classes\Cap;
 use App\Classes\Discount;
 use App\Classes\Packaging;
 use App\Classes\Tax;
@@ -163,6 +164,32 @@ class ProductTest extends TestCase {
         $multiplicativeDiscount = new Discount(10, false, true);
         $productWithMultiplicativeUpcDiscount = new Product("The Little Prince", 12345, 20.25,
             $this->tax, $multiplicativeDiscount, $this->upcDiscount);
+        $report = $productWithMultiplicativeUpcDiscount->reportCosts();
+        $this->assertStringContainsString('Cost = $' . $productWithMultiplicativeUpcDiscount->getPrice(), $report);
+        $this->assertStringContainsString('Tax = $' . $productWithMultiplicativeUpcDiscount->taxCost(), $report);
+        $this->assertStringContainsString('Discounts = $' . $productWithMultiplicativeUpcDiscount->allDiscounts(), $report);
+        $this->assertStringContainsString('TOTAL = $' . $productWithMultiplicativeUpcDiscount->getPriceWithTaxAndDiscounts(), $report);
+    }
+
+    /** @test */
+    public function can_generate_correct_report_with_absolute_cap(): void
+    {
+        $absoluteCap = new Cap(10, 'absolute');
+        $productWithMultiplicativeUpcDiscount = new Product("The Little Prince", 12345, 20.25,
+            $this->tax, $this->discount, $this->upcDiscount, null, null, $absoluteCap);
+        $report = $productWithMultiplicativeUpcDiscount->reportCosts();
+        $this->assertStringContainsString('Cost = $' . $productWithMultiplicativeUpcDiscount->getPrice(), $report);
+        $this->assertStringContainsString('Tax = $' . $productWithMultiplicativeUpcDiscount->taxCost(), $report);
+        $this->assertStringContainsString('Discounts = $' . $productWithMultiplicativeUpcDiscount->allDiscounts(), $report);
+        $this->assertStringContainsString('TOTAL = $' . $productWithMultiplicativeUpcDiscount->getPriceWithTaxAndDiscounts(), $report);
+    }
+
+    /** @test */
+    public function can_generate_correct_report_with_percentage_cap(): void
+    {
+        $absoluteCap = new Cap(10, 'percentage');
+        $productWithMultiplicativeUpcDiscount = new Product("The Little Prince", 12345, 20.25,
+            $this->tax, $this->discount, $this->upcDiscount, null, null, $absoluteCap);
         $report = $productWithMultiplicativeUpcDiscount->reportCosts();
         $this->assertStringContainsString('Cost = $' . $productWithMultiplicativeUpcDiscount->getPrice(), $report);
         $this->assertStringContainsString('Tax = $' . $productWithMultiplicativeUpcDiscount->taxCost(), $report);
