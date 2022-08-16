@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Classes\Discount;
 use App\Classes\Tax;
+use App\Classes\Transport;
 use App\Classes\UpcDiscount;
 use PHPUnit\Framework\TestCase;
 use App\Classes\Product;
@@ -153,5 +154,31 @@ class ProductTest extends TestCase {
         $productWithoutDiscounts = new Product("Book", 123, 100, $this->tax);
         $lowerPrice = $productWithoutDiscounts->getPrice();
         $this->assertEquals($lowerPrice, $productWithoutDiscounts->lowerPrice());
+    }
+
+    /** @test */
+    public function can_calculate_transport_costs_with_absolute_type_of_amount(): void
+    {
+        $transport = new Transport(1, 'absolute');
+        $productWithTransport = new Product("Book", 1244, 100, $this->tax,
+            null, null, $transport);
+        $transportCosts = $transport->getAmount();
+        $this->assertEquals($transportCosts, $productWithTransport->getTransportCost());
+    }
+
+    /** @test */
+    public function can_calculate_transport_costs_with_percentage_type_of_amount(): void
+    {
+        $transport = new Transport(1, 'percentage');
+        $productWithTransport = new Product("Book", 1244, 100, $this->tax,
+            null, null, $transport);
+        $transportCosts = round($productWithTransport->lowerPrice() * $transport->getAmount() / 100, 2);
+        $this->assertEquals($transportCosts, $productWithTransport->getTransportCost());
+    }
+
+    /** @test */
+    public function transport_cost_is_0_if_no_transport(): void
+    {
+        $this->assertEquals(0, $this->product->getTransportCost());
     }
 }

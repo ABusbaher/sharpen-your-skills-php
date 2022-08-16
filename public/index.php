@@ -17,6 +17,7 @@ include_once __DIR__ . '/partials/Discount.php';
 include_once __DIR__ . '/partials/Report.php';
 include_once __DIR__ . '/partials/Selective.php';
 include_once __DIR__ . '/partials/Precedence.php';
+include_once __DIR__ . '/partials/Expenses.php';
 ?>
 </body>
 </html>

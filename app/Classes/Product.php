@@ -18,8 +18,13 @@ class Product implements ProductInterface
 
     public ?UpcDiscount $upcDiscount;
 
+    public ?Transport $transport;
+
+    public ?Packaging $packaging;
+
     public function __construct($name, $upc, $price, Tax $taxRate,
-                                ?Discount $discount = null, ?UpcDiscount $upcDiscount = null)
+                                ?Discount $discount = null, ?UpcDiscount $upcDiscount = null,
+                                ?Transport $transport = null, ?Packaging $packaging = null)
     {
         $this->name = $name;
         $this->upc = $upc;
@@ -27,6 +32,8 @@ class Product implements ProductInterface
         $this->taxRate = $taxRate;
         $this->discount = $discount ?? null;
         $this->upcDiscount = $upcDiscount ?? null;
+        $this->transport = $transport ?? null;
+        $this->packaging = $packaging ?? null;
     }
 
     public function getName(): string
@@ -74,6 +81,34 @@ class Product implements ProductInterface
         return 0;
     }
 
+    public function getTransportCost() :float
+    {
+        if ($this->transport) {
+            if ($this->transport->getTypeOfAmount() === 'absolute') {
+                return $this->transport->getAmount();
+            }
+            if ($this->transport->getTypeOfAmount() === 'percentage') {
+                return round($this->lowerPrice() * $this->transport->getAmount() / 100, 2);
+            }
+            return 0;
+        }
+        return 0;
+    }
+
+    public function getPackagingCost() :float
+    {
+        if ($this->packaging) {
+            if ($this->packaging->getTypeOfAmount() === 'absolute') {
+                return $this->packaging->getAmount();
+            }
+            if ($this->packaging->getTypeOfAmount() === 'percentage') {
+                return round($this->lowerPrice() * $this->packaging->getAmount() / 100, 2);
+            }
+            return 0;
+        }
+        return 0;
+    }
+
     public function lowerPrice() :float
     {
         if ($this->upcDiscount && $this->discount) {
@@ -113,7 +148,7 @@ class Product implements ProductInterface
 
     public function getPriceWithTaxAndDiscounts() : float
     {
-        return $this->getPrice() + $this->taxCost() - $this->allDiscounts();
+        return $this->getPrice() + $this->taxCost() - $this->allDiscounts() + $this->getPackagingCost() + $this->getTransportCost();
     }
 
     public function reportCosts(): string
@@ -121,7 +156,9 @@ class Product implements ProductInterface
         $costs = nl2br('Cost = $' . $this->getPrice() . "\n");
         $tax = nl2br('Tax = $' . $this->taxCost() . "\n");
         $discount = $this->allDiscounts() > 0 ? nl2br('Discounts = $' . $this->allDiscounts() . "\n") : NULL;
+        $packaging = $this->getPackagingCost() > 0 ? nl2br('Packaging = $' . $this->getPackagingCost() . "\n") : NULL;
+        $transport = $this->getTransportCost() > 0 ? nl2br('Transport = $' . $this->getTransportCost() . "\n") : NULL;
         $total = nl2br('TOTAL = $' . $this->getPriceWithTaxAndDiscounts() . "\n");
-        return $costs  . $tax  . $discount  . $total;
+        return $costs  . $tax  . $discount . $packaging . $transport . $total;
     }
 }

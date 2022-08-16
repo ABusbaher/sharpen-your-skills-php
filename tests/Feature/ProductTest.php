@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Classes\Discount;
+use App\Classes\Packaging;
 use App\Classes\Tax;
+use App\Classes\Transport;
 use App\Classes\UpcDiscount;
 use PHPUnit\Framework\TestCase;
 use App\Classes\Product;
@@ -12,6 +14,8 @@ class ProductTest extends TestCase {
 
     private Product $product;
     private Tax $tax;
+    private Discount $discount;
+    private UpcDiscount $upcDiscount;
     private Product $productWithDiscount;
     private Product $productWithTwoDiscounts;
 
@@ -19,12 +23,12 @@ class ProductTest extends TestCase {
     {
         $this->tax = new Tax(20);
         $this->product = new Product("The Little Prince", 12344, 20.25, $this->tax);
-        $discount = new Discount(10);
-        $upcDiscount = new UpcDiscount(5, 123456);
+        $this->discount = new Discount(10);
+        $this->upcDiscount = new UpcDiscount(5, 123456);
         $this->productWithDiscount = new Product("The Little Prince", 12345, 100,
-            $this->tax, $discount);
+            $this->tax, $this->discount);
         $this->productWithTwoDiscounts = new Product("The Little Prince", 12345, 100,
-            $this->tax, $discount, $upcDiscount);
+            $this->tax, $this->discount, $this->upcDiscount);
     }
 
     /** @test */
@@ -122,5 +126,21 @@ class ProductTest extends TestCase {
         $this->assertStringContainsString('Tax = $' . $product->taxCost(), $report);
         $this->assertStringContainsString('TOTAL = $' . $product->getPriceWithTaxAndDiscounts(), $report);
         $this->assertStringContainsString('Discounts = $' . $product->allDiscounts(), $report);
+    }
+
+    /** @test */
+    public function can_generate_report_with_transport_and_packaging_costs(): void
+    {
+        $transport = new Transport(2.2);
+        $packaging = new Packaging(1);
+        $productWithAdditionalCost = new Product("The Little Prince", 12345, 20.25,
+            $this->tax, $this->discount, $this->upcDiscount, $transport, $packaging);
+        $report = $productWithAdditionalCost->reportCosts();
+        $this->assertStringContainsString('Cost = $' . $productWithAdditionalCost->getPrice(), $report);
+        $this->assertStringContainsString('Tax = $' . $productWithAdditionalCost->taxCost(), $report);
+        $this->assertStringContainsString('Discounts = $' . $productWithAdditionalCost->allDiscounts(), $report);
+        $this->assertStringContainsString('Transport = $' . $productWithAdditionalCost->getTransportCost(), $report);
+        $this->assertStringContainsString('Packaging = $' . $productWithAdditionalCost->getPackagingCost(), $report);
+        $this->assertStringContainsString('TOTAL = $' . $productWithAdditionalCost->getPriceWithTaxAndDiscounts(), $report);
     }
 }
