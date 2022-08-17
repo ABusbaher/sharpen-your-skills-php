@@ -7,6 +7,7 @@ use App\Classes\Discount;
 use App\Classes\Tax;
 use App\Classes\Transport;
 use App\Classes\UpcDiscount;
+use App\Exceptions\NotValidCurrencyException;
 use PHPUnit\Framework\TestCase;
 use App\Classes\Product;
 
@@ -242,5 +243,20 @@ class ProductTest extends TestCase {
     public function calculate_cap_is_null_when_no_cap(): void
     {
         $this->assertNull($this->product->calculateCap());
+    }
+
+    /** @test */
+    public function can_update_currency(): void
+    {
+        $this->assertEquals('USD', $this->product->getCurrency());
+        $this->product->setCurrency('GBP');
+        $this->assertEquals('GBP', $this->product->getCurrency());
+    }
+
+    /** @test */
+    public function exception_when_set_not_valid_currency(): void
+    {
+        $this->expectException(NotValidCurrencyException::class);
+        $this->product->setCurrency('not-valid-currency');
     }
 }

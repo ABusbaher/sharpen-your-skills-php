@@ -4,6 +4,8 @@ namespace App\Interfaces;
 
 interface ProductInterface
 {
+    const ALLOWED_CURRENCIES = ['USD', 'GBP', 'JPY'];
+
     public function getName();
 
     public function getUpc();
@@ -12,7 +14,13 @@ interface ProductInterface
 
     public function getPriceWithTax();
 
+    public function getCurrency();
+
+    public function setCurrency(string $currency);
+
     public function allDiscounts();
+
+    public function taxCost();
 
     public function getPriceWithTaxAndDiscounts();
 
@@ -21,6 +29,8 @@ interface ProductInterface
     public function getTransportCost();
 
     public function getPackagingCost();
+
+    public function calculateCap();
 
     public function reportCosts();
 }

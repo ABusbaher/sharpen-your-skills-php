@@ -2,6 +2,7 @@
 
 namespace App\Classes;
 
+use App\Exceptions\NotValidCurrencyException;
 use App\Interfaces\ProductInterface;
 
 class Product implements ProductInterface
@@ -24,9 +25,12 @@ class Product implements ProductInterface
 
     public ?Cap $cap;
 
-    public function __construct($name, $upc, $price, Tax $taxRate,
+    private string $currency;
+
+    public function __construct(string $name, int $upc, float $price, Tax $taxRate,
                                 ?Discount $discount = null, ?UpcDiscount $upcDiscount = null,
-                                ?Transport $transport = null, ?Packaging $packaging = null, ?Cap $cap = null)
+                                ?Transport $transport = null, ?Packaging $packaging = null,
+                                ?Cap $cap = null, string $currency = 'USD')
     {
         $this->name = $name;
         $this->upc = $upc;
@@ -37,6 +41,7 @@ class Product implements ProductInterface
         $this->transport = $transport ?? null;
         $this->packaging = $packaging ?? null;
         $this->cap = $cap ?? null;
+        $this->currency = $currency;
     }
 
     public function getName(): string
@@ -52,6 +57,22 @@ class Product implements ProductInterface
     public function getPrice(): float
     {
         return $this->price;
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+
+    /**
+     * @throws NotValidCurrencyException
+     */
+    public function setCurrency(string $currency): void
+    {
+        if (!in_array(strtoupper($currency), self::ALLOWED_CURRENCIES)) {
+            throw new NotValidCurrencyException();
+        }
+        $this->currency = strtoupper($currency);
     }
 
     public function taxCost() :float
@@ -199,12 +220,15 @@ class Product implements ProductInterface
 
     public function reportCosts(): string
     {
-        $costs = nl2br('Cost = $' . $this->getPrice() . "\n");
-        $tax = nl2br('Tax = $' . $this->taxCost() . "\n");
-        $discount = $this->allDiscounts() > 0 ? nl2br('Discounts = $' . $this->allDiscounts() . "\n") : NULL;
-        $packaging = $this->getPackagingCost() > 0 ? nl2br('Packaging = $' . $this->getPackagingCost() . "\n") : NULL;
-        $transport = $this->getTransportCost() > 0 ? nl2br('Transport = $' . $this->getTransportCost() . "\n") : NULL;
-        $total = nl2br('TOTAL = $' . $this->getPriceWithTaxAndDiscounts() . "\n");
+        $costs = nl2br('Cost = ' . $this->getPrice() . $this->getCurrency() . "\n");
+        $tax = nl2br('Tax = ' . $this->taxCost() . $this->getCurrency() . "\n");
+        $discount = $this->allDiscounts() > 0 ?
+            nl2br('Discounts = ' . $this->allDiscounts() . $this->getCurrency() . "\n") : NULL;
+        $packaging = $this->getPackagingCost() > 0 ?
+            nl2br('Packaging = ' . $this->getPackagingCost() . $this->getCurrency() . "\n") : NULL;
+        $transport = $this->getTransportCost() > 0 ?
+            nl2br('Transport = ' . $this->getTransportCost() . $this->getCurrency() . "\n") : NULL;
+        $total = nl2br('TOTAL = ' . $this->getPriceWithTaxAndDiscounts() . $this->getCurrency() . "\n");
         return $costs  . $tax  . $discount . $packaging . $transport . $total;
     }
 
