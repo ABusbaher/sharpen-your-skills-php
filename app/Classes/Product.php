@@ -77,27 +77,27 @@ class Product implements ProductInterface
 
     public function taxCost() :float
     {
-        return round($this->lowerPrice() * $this->taxRate->getRate() / 100, 2);
+        return round($this->lowerPrice() * $this->taxRate->getRate() / 100, 4);
     }
 
     private function multiplicativeUniversalDiscountAmount(): float
     {
         if ($this->discount->isMultiplicativeDiscount()) {
-            return round(($this->getPrice() - $this->upcDiscountAmount()) * $this->discount->getDiscount() / 100, 2);
+            return round(($this->getPrice() - $this->upcDiscountAmount()) * $this->discount->getDiscount() / 100, 4);
         }
-        return round($this->lowerPrice() * $this->discount->getDiscount() / 100, 2);
+        return round($this->lowerPrice() * $this->discount->getDiscount() / 100, 4);
     }
 
     public function universalDiscountAmount() :float
     {
         if ($this->discount) {
             if($this->discount->isBeforeTax()) {
-                return round($this->getPrice() * $this->discount->getDiscount() / 100, 2);
+                return round($this->getPrice() * $this->discount->getDiscount() / 100, 4);
             }
             if ($this->upcDiscount) {
                 return $this->multiplicativeUniversalDiscountAmount();
             }
-            return round($this->lowerPrice() * $this->discount->getDiscount() / 100, 2);
+            return round($this->lowerPrice() * $this->discount->getDiscount() / 100, 4);
         }
         return 0;
     }
@@ -105,9 +105,9 @@ class Product implements ProductInterface
     private function multiplicativeUpcDiscountAmount(): float
     {
         if ($this->upcDiscount->isMultiplicativeDiscount()) {
-            return round(($this->getPrice() - $this->universalDiscountAmount()) * $this->upcDiscount->getUpcDiscount() / 100, 2);
+            return round(($this->getPrice() - $this->universalDiscountAmount()) * $this->upcDiscount->getUpcDiscount() / 100, 4);
         }
-        return round($this->lowerPrice() * $this->upcDiscount->getUpcDiscount() / 100, 2);
+        return round($this->lowerPrice() * $this->upcDiscount->getUpcDiscount() / 100, 4);
     }
 
 
@@ -116,12 +116,12 @@ class Product implements ProductInterface
         if ($this->upcDiscount) {
             if($this->upcDiscount->getUpc() === $this->getUpc()) {
                 if($this->upcDiscount->isBeforeTax()) {
-                    return round($this->getPrice() * $this->upcDiscount->getUpcDiscount() / 100, 2);
+                    return round($this->getPrice() * $this->upcDiscount->getUpcDiscount() / 100, 4);
                 }
                 if ($this->discount) {
                     return $this->multiplicativeUpcDiscountAmount();
                 }
-                return round($this->lowerPrice() * $this->upcDiscount->getUpcDiscount() / 100, 2);
+                return round($this->lowerPrice() * $this->upcDiscount->getUpcDiscount() / 100, 4);
             }
             return 0;
         }
@@ -135,7 +135,7 @@ class Product implements ProductInterface
                 return $this->transport->getAmount();
             }
             if ($this->transport->getTypeOfAmount() === 'percentage') {
-                return round($this->lowerPrice() * $this->transport->getAmount() / 100, 2);
+                return round($this->lowerPrice() * $this->transport->getAmount() / 100, 4);
             }
             return 0;
         }
@@ -149,7 +149,7 @@ class Product implements ProductInterface
                 return $this->packaging->getAmount();
             }
             if ($this->packaging->getTypeOfAmount() === 'percentage') {
-                return round($this->lowerPrice() * $this->packaging->getAmount() / 100, 2);
+                return round($this->lowerPrice() * $this->packaging->getAmount() / 100, 4);
             }
             return 0;
         }
@@ -189,7 +189,7 @@ class Product implements ProductInterface
                 return $this->cap->getAmount();
             }
             if ($this->cap->getTypeOfAmount() == 'percentage') {
-                return round($this->getPrice() * $this->cap->getAmount() / 100, 2);
+                return round($this->getPrice() * $this->cap->getAmount() / 100, 4);
             }
             return null;
         }
@@ -221,14 +221,14 @@ class Product implements ProductInterface
     public function reportCosts(): string
     {
         $costs = nl2br('Cost = ' . $this->getPrice() . $this->getCurrency() . "\n");
-        $tax = nl2br('Tax = ' . $this->taxCost() . $this->getCurrency() . "\n");
+        $tax = nl2br('Tax = ' . round($this->taxCost(),2) . $this->getCurrency() . "\n");
         $discount = $this->allDiscounts() > 0 ?
-            nl2br('Discounts = ' . $this->allDiscounts() . $this->getCurrency() . "\n") : NULL;
+            nl2br('Discounts = ' . round($this->allDiscounts(),2) . $this->getCurrency() . "\n") : NULL;
         $packaging = $this->getPackagingCost() > 0 ?
-            nl2br('Packaging = ' . $this->getPackagingCost() . $this->getCurrency() . "\n") : NULL;
+            nl2br('Packaging = ' . round($this->getPackagingCost(),2) . $this->getCurrency() . "\n") : NULL;
         $transport = $this->getTransportCost() > 0 ?
-            nl2br('Transport = ' . $this->getTransportCost() . $this->getCurrency() . "\n") : NULL;
-        $total = nl2br('TOTAL = ' . $this->getPriceWithTaxAndDiscounts() . $this->getCurrency() . "\n");
+            nl2br('Transport = ' . round($this->getTransportCost(),2) . $this->getCurrency() . "\n") : NULL;
+        $total = nl2br('TOTAL = ' . round($this->getPriceWithTaxAndDiscounts(), 2) . $this->getCurrency() . "\n");
         return $costs  . $tax  . $discount . $packaging . $transport . $total;
     }
 

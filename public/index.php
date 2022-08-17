@@ -21,6 +21,7 @@ include_once __DIR__ . '/partials/Expenses.php';
 include_once __DIR__ . '/partials/Combining.php';
 include_once __DIR__ . '/partials/CAP.php';
 include_once __DIR__ . '/partials/Currency.php';
+include_once __DIR__ . '/partials/Precision.php';
 ?>
 </body>
 </html>

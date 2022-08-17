@@ -49,17 +49,17 @@ class ProductTest extends TestCase {
     /** @test */
     public function can_calculate_tax_price(): void
     {
-        $taxCost = round($this->product->getPrice() * $this->tax->getRate() / 100, 2);
+        $taxCost = round($this->product->getPrice() * $this->tax->getRate() / 100, 4);
         $this->assertEquals($taxCost, $this->product->taxCost());
     }
 
     /** @test */
     public function price_with_tax_is_changed_when_tax_is_changed(): void
     {
-        $taxCost = round($this->product->getPrice() * $this->tax->getRate() / 100, 2);
+        $taxCost = round($this->product->getPrice() * $this->tax->getRate() / 100, 4);
         $this->assertEquals($taxCost, $this->product->taxCost());
         $this->tax->setRate(21);
-        $changedTaxCost = round($this->product->getPrice() * $this->tax->getRate() / 100, 2);
+        $changedTaxCost = round($this->product->getPrice() * $this->tax->getRate() / 100, 4);
         $this->assertEquals($changedTaxCost, $this->product->taxCost());
     }
 
@@ -73,7 +73,7 @@ class ProductTest extends TestCase {
     public function can_calculate_discount_price(): void
     {
         $priceDiscount = round($this->productWithDiscount->getPrice() *
-            $this->discount->getDiscount() / 100, 2);
+            $this->discount->getDiscount() / 100, 4);
         $this->assertEquals($priceDiscount, $this->productWithDiscount->universalDiscountAmount());
     }
 
@@ -97,7 +97,7 @@ class ProductTest extends TestCase {
         $productWithUpcDiscount = new Product("Book", 1244, 100,
             $this->tax, null, $this->upcDiscount);
         $priceUpcDiscount = round($productWithUpcDiscount->getPrice() *
-            $this->upcDiscount->getUpcDiscount()  / 100, 2);
+            $this->upcDiscount->getUpcDiscount()  / 100, 4);
         $this->assertEquals($priceUpcDiscount, $productWithUpcDiscount->upcDiscountAmount());
     }
 
@@ -106,8 +106,8 @@ class ProductTest extends TestCase {
     {
         $productWithDiscounts = new Product("Book", 1244, 100, $this->tax,
             $this->discount, $this->upcDiscount);
-        $allDiscounts = round($productWithDiscounts->getPrice() * $this->discount->getDiscount() / 100, 2)
-            + round($productWithDiscounts->getPrice() * $this->upcDiscount->getUpcDiscount() / 100, 2);
+        $allDiscounts = round($productWithDiscounts->getPrice() * $this->discount->getDiscount() / 100, 4)
+            + round($productWithDiscounts->getPrice() * $this->upcDiscount->getUpcDiscount() / 100, 4);
         $this->assertEquals($allDiscounts, $productWithDiscounts->allDiscounts());
     }
 
@@ -174,7 +174,7 @@ class ProductTest extends TestCase {
         $transport = new Transport(1, 'percentage');
         $productWithTransport = new Product("Book", 1244, 100, $this->tax,
             null, null, $transport);
-        $transportCosts = round($productWithTransport->lowerPrice() * $transport->getAmount() / 100, 2);
+        $transportCosts = round($productWithTransport->lowerPrice() * $transport->getAmount() / 100, 4);
         $this->assertEquals($transportCosts, $productWithTransport->getTransportCost());
     }
 
@@ -191,7 +191,7 @@ class ProductTest extends TestCase {
         $productWithMultiplicativeDiscount = new Product("Book", 1244, 100, $this->tax,
             $multiplicativeDiscount, $this->upcDiscount);
         $universalDiscount = round(($productWithMultiplicativeDiscount->getPrice() - $productWithMultiplicativeDiscount->upcDiscountAmount())
-            * $multiplicativeDiscount->getDiscount() / 100, 2);
+            * $multiplicativeDiscount->getDiscount() / 100, 4);
         $this->assertEquals($universalDiscount, $productWithMultiplicativeDiscount->universalDiscountAmount());
     }
 
@@ -202,7 +202,7 @@ class ProductTest extends TestCase {
         $productWithMultiplicativeDiscount = new Product("Book", 1244, 100, $this->tax,
             $this->discount, $multiplicativeUpcDiscount);
         $upcDiscount = round(($productWithMultiplicativeDiscount->getPrice() - $productWithMultiplicativeDiscount->universalDiscountAmount())
-            * $multiplicativeUpcDiscount->getUpcDiscount() / 100, 2);
+            * $multiplicativeUpcDiscount->getUpcDiscount() / 100, 4);
         $this->assertEquals($upcDiscount, $productWithMultiplicativeDiscount->upcDiscountAmount());
     }
 
@@ -213,7 +213,7 @@ class ProductTest extends TestCase {
         $productWithMultiplicativeDiscount = new Product("Book", 1244, 100, $this->tax,
             $multiplicativeDiscount);
         $universalDiscount = round($productWithMultiplicativeDiscount->getPrice()
-            * $multiplicativeDiscount->getDiscount() / 100, 2);
+            * $multiplicativeDiscount->getDiscount() / 100, 4);
         $this->assertEquals($universalDiscount, $productWithMultiplicativeDiscount->universalDiscountAmount());
     }
 
@@ -224,7 +224,7 @@ class ProductTest extends TestCase {
         $productWithAbsoluteCap = new Product("Book", 1244, 100, $this->tax,
             null, null, null, null, $cap);
         $capDiscount = round($productWithAbsoluteCap->getPrice()
-            * $cap->getAmount() / 100, 2);
+            * $cap->getAmount() / 100, 4);
         $this->assertEquals($capDiscount, $productWithAbsoluteCap->calculateCap());
     }
 
@@ -235,7 +235,7 @@ class ProductTest extends TestCase {
         $productWithPercentageCap = new Product("Book", 1244, 100, $this->tax,
             null, null, null, null, $cap);
         $capDiscount = round($productWithPercentageCap->getPrice()
-            * $cap->getAmount() / 100, 2);
+            * $cap->getAmount() / 100, 4);
         $this->assertEquals($capDiscount, $productWithPercentageCap->calculateCap());
     }
 
