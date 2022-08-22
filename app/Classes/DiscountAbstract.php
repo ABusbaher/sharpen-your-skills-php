@@ -4,7 +4,7 @@ namespace App\Classes;
 
 use App\Exceptions\NotFloatException;
 use App\Exceptions\NotPositiveFloatException;
-use App\Exceptions\ToHighValueException;
+use App\Exceptions\TooHighValueException;
 use App\Interfaces\DiscountInterface;
 
 class DiscountAbstract implements DiscountInterface
@@ -40,7 +40,7 @@ class DiscountAbstract implements DiscountInterface
     /**
      * @throws NotPositiveFloatException
      * @throws NotFloatException
-     * @throws ToHighValueException
+     * @throws TooHighValueException
      */
     public function setDiscount($discount): void
     {
@@ -51,7 +51,7 @@ class DiscountAbstract implements DiscountInterface
             throw new NotPositiveFloatException();
         }
         if ($discount > 100) {
-            throw new ToHighValueException();
+            throw new TooHighValueException();
         }
         $this->discount = $discount;
     }

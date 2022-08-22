@@ -4,5 +4,5 @@ namespace App\Exceptions;
 
 class NotPositiveFloatException extends \Exception {
 
-    protected $message = 'Negative number/float not allowed!';
+    protected $message = 'Negative number/float is not allowed!';
 }

@@ -5,7 +5,7 @@ namespace Tests\Unit;
 use App\Classes\UpcDiscount;
 use App\Exceptions\NotFloatException;
 use App\Exceptions\NotPositiveFloatException;
-use App\Exceptions\ToHighValueException;
+use App\Exceptions\TooHighValueException;
 use PHPUnit\Framework\TestCase;
 
 class UpcDiscountTest extends TestCase {
@@ -43,7 +43,7 @@ class UpcDiscountTest extends TestCase {
     /** @test */
     public function exception_when_set_tax_rate_bigger_than_100(): void
     {
-        $this->expectException(ToHighValueException::class);
+        $this->expectException(TooHighValueException::class);
         $this->upcDiscount->setDiscount(120);
     }
 

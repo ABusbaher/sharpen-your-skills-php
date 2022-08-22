@@ -4,7 +4,7 @@ namespace App\Classes;
 
 use App\Exceptions\NotPositiveFloatException;
 use App\Exceptions\NotTypeOfAmountException;
-use App\Exceptions\ToHighValueException;
+use App\Exceptions\TooHighValueException;
 use App\Interfaces\ExpensesInterface;
 
 abstract class ExpensesAbstract implements ExpensesInterface
@@ -30,7 +30,7 @@ abstract class ExpensesAbstract implements ExpensesInterface
     }
 
     /**
-     * @throws ToHighValueException
+     * @throws TooHighValueException
      * @throws NotPositiveFloatException
      */
     public function setAmount(float|int $amount): void
@@ -39,7 +39,7 @@ abstract class ExpensesAbstract implements ExpensesInterface
             throw new NotPositiveFloatException();
         }
         if ($amount > 100) {
-            throw new ToHighValueException();
+            throw new TooHighValueException();
         }
         $this->amount = $amount;
     }

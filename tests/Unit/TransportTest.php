@@ -5,7 +5,7 @@ namespace Tests\Unit;
 use App\Classes\Transport;
 use App\Exceptions\NotPositiveFloatException;
 use App\Exceptions\NotTypeOfAmountException;
-use App\Exceptions\ToHighValueException;
+use App\Exceptions\TooHighValueException;
 use PHPUnit\Framework\TestCase;
 
 class TransportTest extends TestCase
@@ -35,7 +35,7 @@ class TransportTest extends TestCase
     /** @test */
     public function exception_when_set_amount_bigger_than_100(): void
     {
-        $this->expectException(ToHighValueException::class);
+        $this->expectException(TooHighValueException::class);
         $this->transport->setAmount(120);
     }
 

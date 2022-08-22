@@ -4,7 +4,7 @@ namespace App\Classes;
 
 use App\Exceptions\NotFloatException;
 use App\Exceptions\NotPositiveFloatException;
-use App\Exceptions\ToHighValueException;
+use App\Exceptions\TooHighValueException;
 use App\Interfaces\TaxInterface;
 
 class Tax implements TaxInterface
@@ -25,7 +25,7 @@ class Tax implements TaxInterface
     /**
      * @throws NotPositiveFloatException
      * @throws NotFloatException
-     * @throws ToHighValueException
+     * @throws TooHighValueException
      */
     public function setRate($rate): void
     {
@@ -36,7 +36,7 @@ class Tax implements TaxInterface
             throw new NotPositiveFloatException();
         }
         if ($rate > 100) {
-            throw new ToHighValueException();
+            throw new TooHighValueException();
         }
         $this->rate = $rate;
     }

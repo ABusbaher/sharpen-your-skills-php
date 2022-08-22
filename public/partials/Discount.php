@@ -5,7 +5,7 @@ use App\Classes\Product as Product;
 use App\Classes\Tax as Tax;
 use App\Exceptions\NotFloatException;
 use App\Exceptions\NotPositiveFloatException;
-use App\Exceptions\ToHighValueException;
+use App\Exceptions\TooHighValueException;
 ?>
 
 <h2>DISCOUNT</h2>
@@ -15,7 +15,7 @@ $tax = new Tax();
 $discount = new Discount();
 try {
     $discount->setDiscount(15);
-} catch (NotFloatException | ToHighValueException | NotPositiveFloatException $ex) {
+} catch (NotFloatException | TooHighValueException | NotPositiveFloatException $ex) {
     echo $ex->getMessage();
     die();
 }

@@ -3,7 +3,7 @@ use App\Classes\Product as Product;
 use App\Classes\Tax as Tax;
 use App\Exceptions\NotFloatException;
 use App\Exceptions\NotPositiveFloatException;
-use App\Exceptions\ToHighValueException;
+use App\Exceptions\TooHighValueException;
 
 $tax = new Tax();
 $product = new Product("The Little Prince", 12345, 20.25, $tax);
@@ -16,7 +16,7 @@ $product = new Product("The Little Prince", 12345, 20.25, $tax);
 <?php
 try {
     $tax->setRate(21);
-} catch (NotFloatException | ToHighValueException | NotPositiveFloatException $ex) {
+} catch (NotFloatException | TooHighValueException | NotPositiveFloatException $ex) {
     echo $ex->getMessage();
     die();
 }
