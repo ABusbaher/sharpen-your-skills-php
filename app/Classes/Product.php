@@ -75,6 +75,32 @@ class Product implements ProductInterface
         $this->currency = strtoupper($currency);
     }
 
+    public function lowerPrice() :float
+    {
+        if ($this->upcDiscount && $this->discount) {
+            if ($this->discount->isBeforeTax() && $this->upcDiscount->isBeforeTax()) {
+                return $this->getPrice() - $this->universalDiscountAmount() - $this->upcDiscountAmount();
+            }else if ($this->discount->isBeforeTax()) {
+                return $this->getPrice() - $this->universalDiscountAmount();
+            }else if ($this->upcDiscount->isBeforeTax()) {
+                return $this->getPrice() - $this->upcDiscountAmount();
+            }else {
+                return $this->getPrice();
+            }
+        }elseif ($this->discount) {
+            if($this->discount->isBeforeTax()) {
+                return $this->getPrice() - $this->universalDiscountAmount();
+            }
+            return $this->getPrice();
+        }elseif ($this->upcDiscount) {
+            if($this->upcDiscount->isBeforeTax()) {
+                return $this->getPrice() - $this->upcDiscountAmount();
+            }
+            return $this->getPrice();
+        }
+        return $this->getPrice();
+    }
+
     public function taxCost() :float
     {
         return round($this->lowerPrice() * $this->taxRate->getRate() / 100, 4);
@@ -105,9 +131,9 @@ class Product implements ProductInterface
     private function multiplicativeUpcDiscountAmount(): float
     {
         if ($this->upcDiscount->isMultiplicativeDiscount()) {
-            return round(($this->getPrice() - $this->universalDiscountAmount()) * $this->upcDiscount->getUpcDiscount() / 100, 4);
+            return round(($this->getPrice() - $this->universalDiscountAmount()) * $this->upcDiscount->getDiscount() / 100, 4);
         }
-        return round($this->lowerPrice() * $this->upcDiscount->getUpcDiscount() / 100, 4);
+        return round($this->lowerPrice() * $this->upcDiscount->getDiscount() / 100, 4);
     }
 
 
@@ -116,12 +142,12 @@ class Product implements ProductInterface
         if ($this->upcDiscount) {
             if($this->upcDiscount->getUpc() === $this->getUpc()) {
                 if($this->upcDiscount->isBeforeTax()) {
-                    return round($this->getPrice() * $this->upcDiscount->getUpcDiscount() / 100, 4);
+                    return round($this->getPrice() * $this->upcDiscount->getDiscount() / 100, 4);
                 }
                 if ($this->discount) {
                     return $this->multiplicativeUpcDiscountAmount();
                 }
-                return round($this->lowerPrice() * $this->upcDiscount->getUpcDiscount() / 100, 4);
+                return round($this->lowerPrice() * $this->upcDiscount->getDiscount() / 100, 4);
             }
             return 0;
         }
@@ -154,33 +180,6 @@ class Product implements ProductInterface
             return 0;
         }
         return 0;
-    }
-
-    public function lowerPrice() :float
-    {
-        if ($this->upcDiscount && $this->discount) {
-            if ($this->discount->isBeforeTax() && $this->upcDiscount->isBeforeTax()) {
-                return $this->getPrice() - $this->universalDiscountAmount() - $this->upcDiscountAmount();
-            }else if ($this->discount->isBeforeTax()) {
-                return $this->getPrice() - $this->universalDiscountAmount();
-            }else if ($this->upcDiscount->isBeforeTax()) {
-                return $this->getPrice() - $this->upcDiscountAmount();
-            }else {
-                return $this->getPrice();
-            }
-        }elseif ($this->discount) {
-            if($this->discount->isBeforeTax()) {
-                return $this->getPrice() - $this->universalDiscountAmount();
-            }
-            return $this->getPrice();
-        }elseif ($this->upcDiscount) {
-            if($this->upcDiscount->isBeforeTax()) {
-                return $this->getPrice() - $this->upcDiscountAmount();
-            }
-            return $this->getPrice();
-        }
-        return $this->getPrice();
-
     }
 
     public function calculateCap() :?float {

@@ -21,30 +21,30 @@ class UpcDiscountTest extends TestCase {
     /** @test */
     public function can_change_discount(): void
     {
-        $this->assertEquals(15, $this->upcDiscount->getUpcDiscount());
-        $this->upcDiscount->setUpcDiscount(20);
-        $this->assertEquals(20, $this->upcDiscount->getUpcDiscount());
+        $this->assertEquals(15, $this->upcDiscount->getDiscount());
+        $this->upcDiscount->setDiscount(20);
+        $this->assertEquals(20, $this->upcDiscount->getDiscount());
     }
 
     /** @test */
     public function exception_when_set_not_float_or_numeric_tax_rate(): void
     {
         $this->expectException(NotFloatException::class);
-        $this->upcDiscount->setUpcDiscount('not number or float');
+        $this->upcDiscount->setDiscount('not number or float');
     }
 
     /** @test */
     public function exception_when_set_negative_tax_rate(): void
     {
         $this->expectException(NotPositiveFloatException::class);
-        $this->upcDiscount->setUpcDiscount(-4);
+        $this->upcDiscount->setDiscount(-4);
     }
 
     /** @test */
     public function exception_when_set_tax_rate_bigger_than_100(): void
     {
         $this->expectException(ToHighValueException::class);
-        $this->upcDiscount->setUpcDiscount(120);
+        $this->upcDiscount->setDiscount(120);
     }
 
     /** @test */

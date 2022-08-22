@@ -5,8 +5,10 @@ namespace App\Classes;
 use App\Exceptions\NotFloatException;
 use App\Exceptions\NotPositiveFloatException;
 use App\Exceptions\ToHighValueException;
+use App\Interfaces\TaxInterface;
 
-class Tax {
+class Tax implements TaxInterface
+{
 
     private int|float $rate;
 
